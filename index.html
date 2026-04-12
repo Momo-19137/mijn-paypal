@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>PayPal</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="paypal.png">
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f5f7fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 85%; max-width: 400px; }
+        img { border-radius: 20px; margin-bottom: 20px; }
+        h2 { margin-bottom: 5px; color: #003087; }
+        p { color: #6d7175; margin-bottom: 20px; font-size: 13px; }
+        .setup-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #6d7175; margin-bottom: 5px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border: 1px solid #babfc3; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .btn-start { background: #003087; color: white; border: none; padding: 15px; border-radius: 25px; font-weight: bold; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer; }
+        .btn-stop { background: #d72c0d; color: white; border: none; padding: 15px; border-radius: 25px; font-weight: bold; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer; }
+        #status { margin-top: 20px; font-weight: 500; font-size: 14px; color: #003087; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="paypal.png" width="80" height="80">
+        <h2>PayPal Simulator</h2>
+        <p>Random Payment Alerts</p>
+        
+        <div class="setup-group">
+            <label>Interval (seconds)</label>
+            <input type="number" id="pIntervalInput" value="5" min="1">
+        </div>
+
+        <button class="btn-start" onclick="startPaypal()">Start Notifications</button>
+        <button class="btn-stop" onclick="stopPaypal()">Stop</button>
+        
+        <div id="status">Status: Idle</div>
+    </div>
+
+    <script>
+        let pTimer = null;
+
+        // Lijst met willekeurige namen
+        const randomNames = [
+            "Amir Robins", "Lars de Bruin", "Sarah Janssen", "Kevin Maes", 
+            "Emma Peeters", "Thomas van Dijk", "Noah Hermans", "Lisa de Wit",
+            "Mila Bakker", "Finn Visser", "Sander Smits", "Sophie Martens"
+        ];
+
+        function startPaypal() {
+            if (pTimer !== null) return;
+            const interval = document.getElementById('pIntervalInput').value;
+            
+            Notification.requestPermission().then(perm => {
+                if (perm === "granted") {
+                    document.getElementById('status').innerText = "Status: Sending PayPal alerts...";
+                    pTimer = setInterval(sendPaypalNotification, interval * 1000);
+                    sendPaypalNotification();
+                }
+            });
+        }
+
+        function stopPaypal() {
+            clearInterval(pTimer);
+            pTimer = null;
+            document.getElementById('status').innerText = "Status: Stopped";
+        }
+
+        function sendPaypalNotification() {
+            // Kies een random naam uit de lijst
+            const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+            
+            // Genereer een random bedrag tussen de €5 en €150
+            const randomAmount = (Math.random() * (150 - 5) + 5).toFixed(2).replace('.', ',');
+            
+            // De melding tekst
+            new Notification("PayPal", {
+                body: "You received €" + randomAmount + " from " + randomName,
+                icon: "paypal.png"
+            });
+        }
+    </script>
+</body>
+</html>
