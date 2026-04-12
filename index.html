@@ -10,7 +10,7 @@
     <style>
         body { font-family: -apple-system, sans-serif; background: #f5f7fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 85%; max-width: 400px; }
-        img { border-radius: 20px; margin-bottom: 20px; }
+        img { border-radius: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h2 { margin-bottom: 5px; color: #003087; }
         p { color: #6d7175; margin-bottom: 20px; font-size: 13px; }
         .setup-group { margin-bottom: 15px; text-align: left; }
@@ -25,7 +25,7 @@
     <div class="card">
         <img src="paypal.png" width="80" height="80">
         <h2>PayPal Simulator</h2>
-        <p>Random Payment Alerts</p>
+        <p>Random English Payment Alerts</p>
         
         <div class="setup-group">
             <label>Interval (seconds)</label>
@@ -41,11 +41,14 @@
     <script>
         let pTimer = null;
 
-        // Lijst met willekeurige namen
+        // Lijst met 30 verschillende Engelse namen
         const randomNames = [
-            "Amir Robins", "Lars de Bruin", "Sarah Janssen", "Kevin Maes", 
-            "Emma Peeters", "Thomas van Dijk", "Noah Hermans", "Lisa de Wit",
-            "Mila Bakker", "Finn Visser", "Sander Smits", "Sophie Martens"
+            "James Wilson", "Oliver Smith", "Liam Johnson", "Mason Brown", "William Jones",
+            "Elijah Garcia", "James Miller", "Benjamin Davis", "Lucas Rodriguez", "Henry Martinez",
+            "Alexander Hernandez", "Sebastian Lopez", "Jack Gonzalez", "Samuel Wilson", "Daniel Anderson",
+            "Charlotte Taylor", "Amelia Thomas", "Harper Moore", "Evelyn Jackson", "Abigail Martin",
+            "Emily Lee", "Elizabeth Perez", "Sofia Thompson", "Avery White", "Ella Harris",
+            "Scarlett Clark", "Victoria Ramirez", "Grace Lewis", "Chloe Robinson", "Layla Walker"
         ];
 
         function startPaypal() {
@@ -68,13 +71,13 @@
         }
 
         function sendPaypalNotification() {
-            // Kies een random naam uit de lijst
+            // Kies een random naam
             const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
             
-            // Genereer een random bedrag tussen de €5 en €150
-            const randomAmount = (Math.random() * (150 - 5) + 5).toFixed(2).replace('.', ',');
+            // Genereer een random bedrag tussen de €10 en €250
+            const randomAmount = (Math.random() * (250 - 10) + 10).toFixed(2).replace('.', ',');
             
-            // De melding tekst
+            // De melding tekst (Recieved met spellingcorrectie naar Received)
             new Notification("PayPal", {
                 body: "You received €" + randomAmount + " from " + randomName,
                 icon: "paypal.png"
