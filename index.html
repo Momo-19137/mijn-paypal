@@ -2,62 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>PayPal</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="paypal.png">
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f5f7fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 85%; max-width: 400px; }
-        img { border-radius: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { margin-bottom: 5px; color: #003087; }
-        p { color: #6d7175; margin-bottom: 20px; font-size: 13px; }
-        .setup-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #6d7175; margin-bottom: 5px; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 1px solid #babfc3; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        .btn-start { background: #003087; color: white; border: none; padding: 15px; border-radius: 25px; font-weight: bold; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer; }
-        .btn-stop { background: #d72c0d; color: white; border: none; padding: 15px; border-radius: 25px; font-weight: bold; font-size: 16px; width: 100%; margin-top: 10px; cursor: pointer; }
-        #status { margin-top: 20px; font-weight: 500; font-size: 14px; color: #003087; }
+        :root {
+            --pp-blue: #003087;
+            --pp-light-blue: #f5f7fa;
+            --pp-text: #142c33;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--pp-light-blue); 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden;
+            color: var(--pp-text);
+        }
+
+        /* SCHERM: PAYPAL APP UI */
+        #mainApp {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background: #f5f7fa;
+        }
+
+        /* Header */
+        .header {
+            padding: 50px 20px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            flex-grow: 1;
+            text-align: center;
+            margin-right: 24px;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: white;
+            margin: 10px 16px;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .pp-logo-small {
+            width: 32px;
+            margin-bottom: 15px;
+        }
+
+        .label-balance {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .balance-input-container {
+            display: flex;
+            align-items: baseline;
+            margin-top: 20px;
+        }
+
+        #balanceInput {
+            font-size: 42px;
+            font-weight: 700;
+            border: none;
+            width: 100%;
+            outline: none;
+            color: #000;
+        }
+
+        /* Activity Section */
+        .activity-tabs {
+            display: flex;
+            padding: 0 16px;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .tab.active { background: black; color: white; }
+        .tab.inactive { background: #e9ecef; color: #545d68; }
+
+        .activity-container {
+            background: white;
+            margin: 15px 16px;
+            border-radius: 16px;
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .transaction {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .trans-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f5f7fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .trans-info { flex-grow: 1; }
+        .trans-name { font-weight: 700; font-size: 15px; }
+        .trans-date { font-size: 12px; color: #6d7175; margin-top: 2px; }
+        .trans-status { font-size: 12px; color: #6d7175; margin-top: 4px; }
+        .trans-amount { font-weight: 700; font-size: 15px; }
+
+        .amount-pos { color: #2d8c3c; }
+        .amount-neg { color: #000; }
+
+        .show-all {
+            text-align: center;
+            color: #0070ba;
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        /* OVERLAY: SIMULATOR SETTINGS */
+        #settingsOverlay {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 100;
+            transition: left 0.3s ease;
+            padding: 50px 20px;
+            box-sizing: border-box;
+        }
+
+        .settings-active #settingsOverlay { left: 0; }
+
+        .close-settings {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--pp-blue);
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: #666; }
+        input[type="number"] { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 10px; font-size: 16px; box-sizing: border-box;}
+        
+        .btn-start { background: var(--pp-blue); color: white; border: none; padding: 16px; border-radius: 30px; width: 100%; font-weight: 700; font-size: 16px; margin-top: 10px; }
+        .btn-stop { background: #d72c0d; color: white; border: none; padding: 16px; border-radius: 30px; width: 100%; font-weight: 700; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <img src="paypal.png" width="80" height="80">
-        <h2>PayPal Simulator</h2>
-        <p>Random English Payment Alerts</p>
-        
-        <div class="setup-group">
-            <label>Interval (seconds)</label>
-            <input type="number" id="pIntervalInput" value="5" min="1">
+
+    <div id="mainApp">
+        <div class="header">
+            <img src="https://cdn-icons-png.flaticon.com/512/271/271220.png" class="back-btn" onclick="openSettings()">
+            <div class="header-title">PayPal balance</div>
+            <div style="width:24px"></div> </div>
+
+        <div class="balance-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="pp-logo-small">
+            <div class="label-balance">PayPal balance</div>
+            <div class="balance-input-container">
+                <input type="text" id="balanceInput" value="0,00 €">
+            </div>
         </div>
 
+        <div class="activity-tabs">
+            <div class="tab active">Activity</div>
+            <div class="tab inactive">Currencies</div>
+        </div>
+
+        <div class="activity-container">
+            <div class="transaction">
+                <div class="trans-icon">🏦</div>
+                <div class="trans-info">
+                    <div class="trans-name">KBC Bank NV</div>
+                    <div class="trans-date">27 Mar 2026</div>
+                    <div class="trans-status">Instant transfer to bank - Completed</div>
+                </div>
+                <div class="trans-amount amount-neg">-18.70 €</div>
+            </div>
+
+            <div class="transaction">
+                <div class="trans-icon">👤</div>
+                <div class="trans-info">
+                    <div class="trans-name">Alexander Kokonis</div>
+                    <div class="trans-date">27 Mar 2026</div>
+                    <div class="trans-status">Money received</div>
+                </div>
+                <div class="trans-amount amount-pos">+18.70 €</div>
+            </div>
+
+            <div class="show-all">Show all</div>
+        </div>
+    </div>
+
+    <div id="settingsOverlay">
+        <div class="close-settings" onclick="closeSettings()">← Back to App</div>
+        <h2>Simulator Controls</h2>
+        <div class="input-group">
+            <label>INTERVAL (SECONDS)</label>
+            <input type="number" id="pIntervalInput" value="5">
+        </div>
         <button class="btn-start" onclick="startPaypal()">Start Notifications</button>
-        <button class="btn-stop" onclick="stopPaypal()">Stop</button>
-        
-        <div id="status">Status: Idle</div>
+        <button class="btn-stop" onclick="stopPaypal()">Stop Notifications</button>
+        <p id="status" style="text-align:center; margin-top:20px;">Status: Idle</p>
     </div>
 
     <script>
         let pTimer = null;
+        const randomNames = ["James Wilson", "Oliver Smith", "Liam Johnson", "Mason Brown", "William Jones", "Elijah Garcia", "James Miller", "Benjamin Davis", "Lucas Rodriguez", "Henry Martinez", "Alexander Hernandez", "Sebastian Lopez", "Jack Gonzalez", "Samuel Wilson", "Daniel Anderson", "Charlotte Taylor", "Amelia Thomas", "Harper Moore", "Evelyn Jackson", "Abigail Martin", "Emily Lee", "Elizabeth Perez", "Sofia Thompson", "Avery White", "Ella Harris", "Scarlett Clark", "Victoria Ramirez", "Grace Lewis", "Chloe Robinson", "Layla Walker"];
 
-        // Lijst met 30 verschillende Engelse namen
-        const randomNames = [
-            "James Wilson", "Oliver Smith", "Liam Johnson", "Mason Brown", "William Jones",
-            "Elijah Garcia", "James Miller", "Benjamin Davis", "Lucas Rodriguez", "Henry Martinez",
-            "Alexander Hernandez", "Sebastian Lopez", "Jack Gonzalez", "Samuel Wilson", "Daniel Anderson",
-            "Charlotte Taylor", "Amelia Thomas", "Harper Moore", "Evelyn Jackson", "Abigail Martin",
-            "Emily Lee", "Elizabeth Perez", "Sofia Thompson", "Avery White", "Ella Harris",
-            "Scarlett Clark", "Victoria Ramirez", "Grace Lewis", "Chloe Robinson", "Layla Walker"
-        ];
+        function openSettings() {
+            document.body.classList.add('settings-active');
+        }
+
+        function closeSettings() {
+            document.body.classList.remove('settings-active');
+        }
 
         function startPaypal() {
             if (pTimer !== null) return;
             const interval = document.getElementById('pIntervalInput').value;
-            
             Notification.requestPermission().then(perm => {
                 if (perm === "granted") {
-                    document.getElementById('status').innerText = "Status: Sending PayPal alerts...";
+                    document.getElementById('status').innerText = "Status: Running...";
                     pTimer = setInterval(sendPaypalNotification, interval * 1000);
                     sendPaypalNotification();
                 }
@@ -71,13 +272,8 @@
         }
 
         function sendPaypalNotification() {
-            // Kies een random naam
             const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-            
-            // Genereer een random bedrag tussen de €10 en €250
             const randomAmount = (Math.random() * (250 - 10) + 10).toFixed(2).replace('.', ',');
-            
-            // De melding tekst (Recieved met spellingcorrectie naar Received)
             new Notification("PayPal", {
                 body: "You received €" + randomAmount + " from " + randomName,
                 icon: "paypal.png"
