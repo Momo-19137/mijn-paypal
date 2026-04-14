@@ -4,118 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>PayPal</title>
     <style>
-        :root {
-            --pp-blue: #003087;
-            --pp-bg: #f5f7fa;
-        }
-
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: var(--pp-bg); 
-            margin: 0; 
-            padding: 0; 
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+            background-color: #f5f7fa;
+            font-family: -apple-system, sans-serif;
         }
 
-        #mainApp {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+        /* De volledige screenshot als achtergrond */
+        #appContainer {
             width: 100vw;
+            height: 100vh;
+            background: url('background.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
         }
 
-        /* Header & Nav */
-        .nav-bar {
-            padding: 50px 20px 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .back-btn {
-            width: 22px;
-            height: 22px;
+        /* Onzichtbare knop over het pijltje linksboven */
+        #navTrigger {
+            position: absolute;
+            top: 45px;   /* Aanpassen op basis van je screenshot */
+            left: 15px;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
+            z-index: 10;
+            /* background: rgba(255,0,0,0.2);  Haal de comment weg om de knop even te zien tijdens het testen */
         }
 
-        /* Balance Section */
-        .balance-card {
-            background: white;
-            margin: 0 16px 15px;
-            padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-
-        .header-img {
-            width: 180px; /* PayPal Logo + Balance tekst */
-            height: auto;
-            display: block;
-            margin-bottom: 15px;
-        }
-
+        /* Bewerkbaar tekstveld over het bedrag */
         #balanceInput {
-            font-size: 44px;
+            position: absolute;
+            top: 245px;  /* Precies op de plek van het bedrag zetten */
+            left: 45px;
+            width: 250px;
+            font-size: 42px;
             font-weight: 700;
-            border: none;
-            width: 100%;
-            outline: none;
             color: #000;
+            border: none;
             background: transparent;
+            outline: none;
             letter-spacing: -1px;
-        }
-
-        /* Tabs Section */
-        .tabs-container {
-            padding: 0 16px;
-            margin-bottom: 10px;
-        }
-
-        .tabs-img {
-            width: 100%;
-            height: auto;
-            border-radius: 30px;
-        }
-
-        /* Activity Section */
-        .activity-container {
-            background: white;
-            margin: 5px 16px;
-            border-radius: 18px;
-            padding: 10px 20px;
-            flex-grow: 1;
-        }
-
-        .transaction {
-            display: flex;
-            align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid #f0f2f5;
-        }
-
-        .trans-icon-img {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            margin-right: 15px;
-        }
-
-        .trans-info { flex-grow: 1; }
-        .trans-name { font-weight: 700; font-size: 16px; color: #142c33; }
-        .trans-date { font-size: 13px; color: #6d7175; margin-top: 2px; }
-        .trans-status { font-size: 13px; color: #6d7175; margin-top: 4px; }
-        .trans-amount { font-weight: 700; font-size: 16px; }
-
-        .amount-pos { color: #2d8c3c; }
-
-        .show-all {
-            text-align: center;
-            color: #0070ba;
-            font-weight: 700;
-            font-size: 15px;
-            padding: 20px 0;
         }
 
         /* SETTINGS OVERLAY */
@@ -133,61 +67,32 @@
         }
 
         .settings-active #settingsOverlay { left: 0; }
-        .close-settings { color: var(--pp-blue); font-weight: 700; margin-bottom: 30px; display: block; cursor: pointer; }
+        .close-settings { color: #003087; font-weight: 700; margin-bottom: 30px; display: block; cursor: pointer; text-decoration: none; }
+        label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: #666; }
         input[type="number"] { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 12px; font-size: 16px; margin-bottom: 20px; }
-        .btn-start { background: var(--pp-blue); color: white; border: none; padding: 16px; border-radius: 30px; width: 100%; font-weight: 700; font-size: 16px; }
+        .btn-start { background: #003087; color: white; border: none; padding: 16px; border-radius: 30px; width: 100%; font-weight: 700; font-size: 16px; }
         .btn-stop { background: #d72c0d; color: white; border: none; padding: 16px; border-radius: 30px; width: 100%; font-weight: 700; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="mainApp">
-        <div class="nav-bar">
-            <img src="back-arrow.png" class="back-btn" onclick="openSettings()">
-        </div>
-
-        <div class="balance-card">
-            <img src="pp-header.png" class="header-img">
-            <input type="text" id="balanceInput" value="0,00 €">
-        </div>
-
-        <div class="tabs-container">
-            <img src="tabs.png" class="tabs-img">
-        </div>
-
-        <div class="activity-container">
-            <div class="transaction">
-                <img src="bank-icon.png" class="trans-icon-img">
-                <div class="trans-info">
-                    <div class="trans-name">KBC Bank NV</div>
-                    <div class="trans-date">27 Mar 2026</div>
-                    <div class="trans-status">Instant transfer to bank - Completed</div>
-                </div>
-                <div class="trans-amount">-18.70 €</div>
-            </div>
-
-            <div class="transaction">
-                <img src="user-icon.png" class="trans-icon-img">
-                <div class="trans-info">
-                    <div class="trans-name">Alexander Kokonis</div>
-                    <div class="trans-date">27 Mar 2026</div>
-                    <div class="trans-status">Money received</div>
-                </div>
-                <div class="trans-amount amount-pos">+18.70 €</div>
-            </div>
-
-            <div class="show-all">Show all</div>
-        </div>
+    <div id="appContainer">
+        <div id="navTrigger" onclick="openSettings()"></div>
+        
+        <input type="text" id="balanceInput" value="0,00 €">
     </div>
 
     <div id="settingsOverlay">
-        <div class="close-settings" onclick="closeSettings()">← Back to App</div>
-        <h2>Notificatie Instellingen</h2>
-        <label>Interval (seconden)</label>
+        <a class="close-settings" onclick="closeSettings()">← Back to App</a>
+        <h2>Notificatie Controls</h2>
+        
+        <label>INTERVAL (SECONDEN)</label>
         <input type="number" id="pIntervalInput" value="5">
+
         <button class="btn-start" onclick="startPaypal()">Start Notifications</button>
-        <button class="btn-stop" onclick="stopPaypal()">Stop</button>
-        <p id="status" style="text-align:center; margin-top:20px; font-weight:bold; color:var(--pp-blue);">Status: Idle</p>
+        <button class="btn-stop" onclick="stopPaypal()">Stop Notifications</button>
+        
+        <p id="status" style="text-align:center; font-weight:bold; color:#003087; margin-top:20px;">Status: Idle</p>
     </div>
 
     <script>
